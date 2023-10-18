@@ -123,7 +123,7 @@
      <string>Cancel</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="url_le">
     <property name="geometry">
      <rect>
       <x>100</x>
