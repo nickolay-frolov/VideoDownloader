@@ -49,11 +49,10 @@ def download_video(video_url: str,
                    resolution: str = '720p'):
     try:
         video = YouTube(video_url)
-        if is_video_available(video):
-            stream = video.streams.filter(res=resolution,
-                                          only_audio=audio_track,
-                                          mime_type="video/mp4").first()
-            stream.download(SAVE_DIR)
+        stream = video.streams.filter(res=resolution,
+                                      only_audio=audio_track,
+                                      mime_type="video/mp4").first()
+        stream.download(SAVE_DIR)
     except Exception as e:
         print(f"Произошла ошибка при скачивании видео: {repr(e)}")
 
