@@ -3,12 +3,27 @@ import sys
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QWidget, QPushButton, QLineEdit, QComboBox, QCheckBox, QMainWindow, QLabel
 from PySide6.QtCore import QFile, QIODevice
+from pytube.exceptions import RegexMatchError, VideoUnavailable
 
 from VideoObject import VideoObject
-from logic import *
+from environment import *
 
 
 class MainWindow(QMainWindow):
+    download_btn: QPushButton
+    cancel_btn: QPushButton
+    download_thumbnail_btn: QPushButton
+    load_info_btn: QPushButton
+
+    url_le: QLineEdit
+    res_cb: QComboBox
+
+    audio_chb: QCheckBox
+
+    title_label: QLabel
+    thumbnail_label: QLabel
+    author_label: QLabel
+    duration_label: QLabel
     def __init__(self):
         super().__init__()
         window = self.setup_ui()
@@ -21,8 +36,8 @@ class MainWindow(QMainWindow):
 
         self.url_le = window.findChild(QLineEdit, "url_le")
 
-        self.res_cb = window.findChild(QComboBox,"res_cb")
-        self.audio_cbh = window.findChild(QCheckBox, "audio_chb")
+        self.res_cb = window.findChild(QComboBox, "res_cb")
+        self.audio_chb = window.findChild(QCheckBox, "audio_chb")
 
         self.title_label = window.findChild(QLabel, "title_label")
         self.thumbnail_label = window.findChild(QLabel, "thumbnail_label")
@@ -65,15 +80,21 @@ class MainWindow(QMainWindow):
 
     def on_load_click(self):
         url_str = self.url_le.text()
-        video = VideoObject(url_str)
 
-        if is_video_available(YouTube(url_str)):
-            self.title_label.setText(video.title)
+        try:
+            video = VideoObject(url_str)
+
+            self.title_label.setText(video.title[:70] + '...' if len(video.title) > 70 else video.title)
+
             self.thumbnail_label.setPixmap(video.thumbnail_img)
+            self.thumbnail_label.setScaledContents(True)
+
             self.author_label.setText(video.author)
             self.duration_label.setText(video.duration)
 
+            self.res_cb.clear()
             self.res_cb.addItems(video.resolutions)
-
-        else:
-            print('Ошибка!!!')
+        except RegexMatchError:
+            self.title_label.setText('Link is incorrect')
+        except VideoUnavailable:
+            self.title_label.setText('This video is not available')
