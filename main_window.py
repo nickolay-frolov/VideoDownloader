@@ -4,6 +4,8 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QWidget, QPushButton, QLineEdit, QComboBox, QCheckBox, QMainWindow, QLabel
 from PySide6.QtCore import QFile, QIODevice
 from pytube.exceptions import RegexMatchError, VideoUnavailable
+from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt
 
 from VideoObject import VideoObject
 from environment import *
@@ -24,10 +26,16 @@ class MainWindow(QMainWindow):
     thumbnail_label: QLabel
     author_label: QLabel
     duration_label: QLabel
+
+    video_obj: VideoObject
+
     def __init__(self):
         super().__init__()
         window = self.setup_ui()
+
         self.setCentralWidget(window)
+        self.setWindowTitle('Video Downloader')
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self.download_btn = window.findChild(QPushButton, "download_video_btn")
         self.cancel_btn = window.findChild(QPushButton, "cancel_btn")
@@ -47,18 +55,27 @@ class MainWindow(QMainWindow):
         self.download_btn.clicked.connect(self.on_download_click)
         self.cancel_btn.clicked.connect(self.on_close_click)
         self.load_info_btn.clicked.connect(self.on_load_click)
+        self.download_thumbnail_btn.clicked.connect(self.on_thumbnail_save_click)
+
         self.url_le.setFocus()
 
     def setup_ui(self) -> QWidget:
         ui_file = QFile("mainWindow.ui")
+        style_file = QFile("mainWindow_styles.qss")
 
         try:
             if not ui_file.open(QIODevice.ReadOnly):
-                raise Exception(f"Ошибка открытия файла {ui_file}: "
+                raise Exception(f"Ошибка открытия UI файла {ui_file}: "
                                 f"{ui_file.errorString()}")
+
+            if not style_file.open(QIODevice.ReadOnly):
+                raise Exception(f"Ошибка открытия QSS файла {style_file}: "
+                                f"{style_file.errorString()}")
 
             loader = QUiLoader()
             window = loader.load(ui_file)
+
+            self.setStyleSheet(style_file.readAll().data().decode("utf-8"))
 
             if not window:
                 raise Exception(loader.errorString())
@@ -69,8 +86,41 @@ class MainWindow(QMainWindow):
 
         finally:
             ui_file.close()
+            style_file.close()
 
         return window
+
+    def on_load_click(self):
+        url_str = self.url_le.text()
+
+        try:
+            self.video_obj = VideoObject(url_str)
+
+            self.title_label.setText(self.video_obj.title[:70] + '...'
+                                     if len(self.video_obj.title) > 70 else self.video_obj.title)
+
+            thumbnail_map = QPixmap()
+            thumbnail_map.loadFromData(self.video_obj.thumbnail_img)
+
+            self.thumbnail_label.setPixmap(thumbnail_map)
+            self.thumbnail_label.setScaledContents(True)
+
+            self.author_label.setText(self.video_obj.author)
+            self.duration_label.setText(self.video_obj.duration)
+
+            self.res_cb.clear()
+            self.res_cb.addItems(self.video_obj.resolutions)
+
+        except RegexMatchError:
+            self.title_label.setText('Link is incorrect')
+        except VideoUnavailable:
+            self.title_label.setText('This video is not available')
+
+    def on_thumbnail_save_click(self):
+        thumbnail_file = SAVE_DIR + self.video_obj.title + '_thumbnail' + IMAGE_FORMAT
+
+        with open(thumbnail_file, 'wb') as f:
+            f.write(self.video_obj.thumbnail_img)
 
     def on_download_click(self):
         ...
@@ -78,23 +128,4 @@ class MainWindow(QMainWindow):
     def on_close_click(self):
         sys.exit(0)
 
-    def on_load_click(self):
-        url_str = self.url_le.text()
 
-        try:
-            video = VideoObject(url_str)
-
-            self.title_label.setText(video.title[:70] + '...' if len(video.title) > 70 else video.title)
-
-            self.thumbnail_label.setPixmap(video.thumbnail_img)
-            self.thumbnail_label.setScaledContents(True)
-
-            self.author_label.setText(video.author)
-            self.duration_label.setText(video.duration)
-
-            self.res_cb.clear()
-            self.res_cb.addItems(video.resolutions)
-        except RegexMatchError:
-            self.title_label.setText('Link is incorrect')
-        except VideoUnavailable:
-            self.title_label.setText('This video is not available')

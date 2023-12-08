@@ -1,0 +1,36 @@
+QWidget{
+    font-size: 16px;
+}
+
+QMainWindow {
+    background-color: #242526;
+    border-radius: 10px;
+}
+
+QLabel {
+    color: whitesmoke;
+    font-weight: bold;
+}
+
+QPushButton {
+    border-radius: 10px;
+    color: whitesmoke;
+    background: darkgrey;
+    font-weight: bold;
+}
+
+#audio_chb {
+    font-size: 16px;
+    color: whitesmoke;
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: darkgrey;
+}
+
+#duration_label {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+
+

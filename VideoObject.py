@@ -1,6 +1,5 @@
 import requests
 
-from PySide6.QtGui import QPixmap
 from pytube import YouTube
 
 
@@ -11,7 +10,7 @@ class VideoObject:
     author: str
     duration: str
     streams: []
-    thumbnail_img: QPixmap
+    thumbnail_img: bytes
     resolutions: []
 
     def __init__(self, url_str: str):
@@ -28,15 +27,16 @@ class VideoObject:
         thumbnail_url = self.video_obj.thumbnail_url
         r = requests.get(thumbnail_url, allow_redirects=True, stream=False)
 
-        self.thumbnail_img = QPixmap()
-        self.thumbnail_img.loadFromData(r.content)
+        self.thumbnail_img = r.content
+        # self.thumbnail_img.loadFromData(r.content)
+
         self.resolutions = self.get_resolution_list()
 
     def get_resolution_list(self) -> []:
         """
             Возвращает доступные разрешения видео на YouTube.
             Returns:
-                []:  Список разрешений видео
+                []: Список разрешений видео
         """
         video_resolutions = []
         for stream in self.streams:
