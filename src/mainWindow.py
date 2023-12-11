@@ -7,7 +7,7 @@ from pytube.exceptions import RegexMatchError, VideoUnavailable
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 
-from VideoObject import VideoObject
+from videoObject import VideoObject
 from environment import *
 
 
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(window)
         self.setWindowTitle('Video Downloader')
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self.download_btn = window.findChild(QPushButton, "download_video_btn")
         self.cancel_btn = window.findChild(QPushButton, "cancel_btn")
@@ -60,8 +60,8 @@ class MainWindow(QMainWindow):
         self.url_le.setFocus()
 
     def setup_ui(self) -> QWidget:
-        ui_file = QFile("mainWindow.ui")
-        style_file = QFile("mainWindow_styles.qss")
+        ui_file = QFile("src\mainWindow.ui")
+        style_file = QFile("styles\mainWindow_styles.qss")
 
         try:
             if not ui_file.open(QIODevice.ReadOnly):
