@@ -4,7 +4,7 @@
 import requests
 
 from pytube import YouTube
-
+from collections import OrderedDict
 
 class VideoObject:
     url_str: str
@@ -14,7 +14,7 @@ class VideoObject:
     duration: str
     streams: []
     thumbnail_img: bytes
-    resolutions: []
+    res_stream_dict: dict
 
     def __init__(self, url_str: str):
         self.video_obj = YouTube(url_str)
@@ -25,23 +25,17 @@ class VideoObject:
         str_dur = f"{int_dur // 3600}:{(int_dur % 3600) // 60:02d}:{int_dur % 60:02d}"
         self.duration = str_dur
 
-        self.streams = self.video_obj.streams.order_by('resolution').filter(progressive=True).desc()
+        self.streams = self.video_obj.streams.order_by('resolution').desc()
 
         thumbnail_url = self.video_obj.thumbnail_url
         r = requests.get(thumbnail_url, allow_redirects=True, stream=False)
 
         self.thumbnail_img = r.content
-        # self.thumbnail_img.loadFromData(r.content)
+        self.res_stream_dict = self.get_stream_dict()
 
-        self.resolutions = self.get_resolution_list()
-
-    def get_resolution_list(self) -> []:
+    def get_stream_dict(self) -> dict:
         """
-            Возвращает доступные разрешения видео на YouTube.
-            Returns:
-                []: Список разрешений видео
+        Возвращает словарь из разрешений видео и 
+        соответствующих им потоков для скачивания 
         """
-        video_resolutions = []
-        for stream in self.streams:
-            video_resolutions.append(stream.resolution)
-        return list(dict.fromkeys(video_resolutions))
+        return OrderedDict((stream.resolution, stream) for stream in self.streams)
