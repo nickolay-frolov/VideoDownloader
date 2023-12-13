@@ -1,10 +1,10 @@
 QWidget{
     font-size: 16px;
+    border-radius: 10px;
 }
 
 QMainWindow {
-    background-color: #242526;
-    border-radius: 10px;
+    background-color: #24283b;
 }
 
 QLabel {
@@ -13,18 +13,23 @@ QLabel {
 }
 
 QPushButton {
-    border-radius: 10px;
     color: whitesmoke;
-    background: darkgrey;
+    background: #7aa2f7;
     font-weight: bold;
+}
+
+QPushButton:hover {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: whitesmoke;
 }
 
 #audio_chb {
     font-size: 16px;
     color: whitesmoke;
     font-weight: bold;
-    border-radius: 10px;
-    background-color: darkgrey;
+    background-color: #7aa2f7;
 }
 
 #duration_label {
@@ -32,5 +37,35 @@ QPushButton {
     font-weight: normal;
 }
 
+#title_label, #author_label{
+    color: whitesmoke;
+    font-weight: bold;
+    background-color: #7aa2f7;
+} 
 
+#title_label {
+    font-size: 22px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
 
+#author_label {
+    font-size: 18px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+#thumbnail_label {
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 10px;
+    border-color: black;
+}
+
+#minimize_btn, #cancel_min_btn {
+    border-radius: 4px;
+}
+
+#minimize_btn, #cancel_min_btn:hover {
+    border-style: none;
+}

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys
 
 from PySide6.QtUiTools import QUiLoader
@@ -35,12 +38,17 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(window)
         self.setWindowTitle('Video Downloader')
-        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        
+        self.draggable = True
+        self.offset = None
+        
         self.download_btn = window.findChild(QPushButton, "download_video_btn")
         self.cancel_btn = window.findChild(QPushButton, "cancel_btn")
         self.download_thumbnail_btn = window.findChild(QPushButton, "download_thumbnail_btn")
         self.load_info_btn = window.findChild(QPushButton, "load_info_btn")
+        self.cancel_min_btn = window.findChild(QPushButton, "cancel_min_btn")
+        self.minimize_btn = window.findChild(QPushButton, "minimize_btn")
 
         self.url_le = window.findChild(QLineEdit, "url_le")
 
@@ -56,6 +64,8 @@ class MainWindow(QMainWindow):
         self.cancel_btn.clicked.connect(self.on_close_click)
         self.load_info_btn.clicked.connect(self.on_load_click)
         self.download_thumbnail_btn.clicked.connect(self.on_thumbnail_save_click)
+        self.cancel_min_btn.clicked.connect(self.on_close_click)
+        self.minimize_btn.clicked.connect(self.on_minimize_click)
 
         self.url_le.setFocus()
 
@@ -89,7 +99,21 @@ class MainWindow(QMainWindow):
             style_file.close()
 
         return window
+    
+    # move window
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton and self.draggable:
+            self.offset = event.pos()
 
+    def mouseMoveEvent(self, event):
+        if self.offset is not None and self.draggable:
+            self.move(self.pos() + event.pos() - self.offset)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self.draggable:
+            self.offset = None
+
+    
     def on_load_click(self):
         url_str = self.url_le.text()
 
@@ -125,7 +149,8 @@ class MainWindow(QMainWindow):
     def on_download_click(self):
         ...
 
+    def on_minimize_click(self):
+        self.showMinimized()
+
     def on_close_click(self):
         sys.exit(0)
-
-
