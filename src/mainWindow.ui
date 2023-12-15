@@ -41,9 +41,9 @@
    <widget class="QLabel" name="thumbnail_label">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>200</y>
-      <width>261</width>
+      <width>271</width>
       <height>161</height>
      </rect>
     </property>
@@ -117,8 +117,8 @@
    <widget class="QLabel" name="duration_label">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>340</y>
+      <x>240</x>
+      <y>347</y>
       <width>41</width>
       <height>16</height>
      </rect>

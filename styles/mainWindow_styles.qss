@@ -25,6 +25,10 @@ QPushButton:hover {
     border-color: whitesmoke;
 }
 
+#res_cb{
+    border-radius: 0px;
+}
+
 #audio_chb {
     font-size: 16px;
     color: whitesmoke;
@@ -34,7 +38,7 @@ QPushButton:hover {
 
 #duration_label {
     font-size: 12px;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 #title_label, #author_label{
@@ -56,10 +60,7 @@ QPushButton:hover {
 }
 
 #thumbnail_label {
-    border-style: solid;
-    border-width: 3px;
     border-radius: 10px;
-    border-color: black;
 }
 
 #minimize_btn, #cancel_min_btn {

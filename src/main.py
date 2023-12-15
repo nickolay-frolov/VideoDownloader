@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-
 from PySide6.QtWidgets import QApplication
 from mainWindow import MainWindow
 

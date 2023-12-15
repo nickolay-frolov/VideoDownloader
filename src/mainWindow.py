@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 
 from PySide6.QtUiTools import QUiLoader
@@ -30,7 +31,7 @@ class MainWindow(QMainWindow):
     author_label: QLabel
     duration_label: QLabel
 
-    video_obj: VideoObject
+    cur_video: VideoObject
 
     def __init__(self):
         super().__init__()
@@ -68,6 +69,9 @@ class MainWindow(QMainWindow):
         self.minimize_btn.clicked.connect(self.on_minimize_click)
 
         self.url_le.setFocus()
+
+        self.check_save_dir()
+
 
     #load user interface
     def setup_ui(self) -> QWidget:
@@ -114,54 +118,49 @@ class MainWindow(QMainWindow):
         if event.button() == Qt.LeftButton and self.draggable:
             self.offset = None
 
+    # check exist save directories
+    def check_save_dir(self):
+       if not os.path.exists(SAVE_DIR):
+           os.makedirs(SAVE_DIR)
+       
+       subdirectories = [VIDEO_DIR, AUDIO_DIR, THUMB_DIR]
+       for subdirectory in subdirectories:
+            if not os.path.exists(subdirectory):
+               os.makedirs(subdirectory) 
+
     # load video info
     def on_load_click(self):
         url_str = self.url_le.text()
 
         try:
-            self.video_obj = VideoObject(url_str)
-
-            self.title_label.setText(self.video_obj.title[:70] + '...'
-                                     if len(self.video_obj.title) > 70 else self.video_obj.title)
+            self.cur_video = VideoObject(url_str)
+            self.title_label.setText(self.cur_video.title[:70] + '...'
+                                     if len(self.cur_video.title) > 70 
+                                     else self.cur_video.title)
 
             thumbnail_map = QPixmap()
-            thumbnail_map.loadFromData(self.video_obj.thumbnail_img)
+            thumbnail_map.loadFromData(self.cur_video.thumbnail_img)
 
             self.thumbnail_label.setPixmap(thumbnail_map)
             self.thumbnail_label.setScaledContents(True)
 
-            self.author_label.setText(self.video_obj.author)
-            self.duration_label.setText(self.video_obj.duration)
+            self.author_label.setText(self.cur_video.author)
+            self.duration_label.setText(self.cur_video.duration)
 
             self.res_cb.clear()
-            self.res_cb.addItems(list(self.video_obj.res_stream_dict.keys()))
-
+            self.res_cb.addItems(list(self.cur_video.res_stream_dict.keys()))
         except RegexMatchError:
             self.title_label.setText('Link is incorrect')
         except VideoUnavailable:
             self.title_label.setText('This video is not available')
-
-    #save video thumbnail
+    
     def on_thumbnail_save_click(self):
-        thumbnail_file = SAVE_DIR + self.video_obj.title + '_thumbnail' + IMAGE_FORMAT
+        self.cur_video.save_thumbnail()
 
-        with open(thumbnail_file, 'wb') as f:
-            f.write(self.video_obj.thumbnail_img)
-
-    # download stream
     def on_download_click(self):
-        cur_res = self.res_cb.currentText()
-        cur_stream = self.video_obj.res_stream_dict.get(cur_res)
-       
-        try:
-            if cur_stream.is_progressive:
-                cur_stream.download(output_path=SAVE_DIR, 
-                                    filename=self.video_obj.title + VIDEO_FORMAT)
-            else:
-                print('need audio')
-        except Exception as e:
-            ...
-
+        is_only_audio = self.audio_chb.isChecked()
+        resolution = self.res_cb.currentText()
+        self.cur_video.download_video(is_only_audio, resolution)
 
     def on_minimize_click(self):
         self.showMinimized()
