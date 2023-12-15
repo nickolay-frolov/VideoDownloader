@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import re
 
 from pytube import YouTube
 from collections import OrderedDict
@@ -12,6 +13,7 @@ class VideoObject:
     url_str: str
     is_available: bool
     title: str
+    __title_file: str
     author: str
     duration: str
     streams: []
@@ -22,6 +24,7 @@ class VideoObject:
         youtube_obj = YouTube(url_str)
         
         self.title = youtube_obj.title
+        self.__title_file = re.sub(r'[^a-zA-Z0-9\s\-_]', '', self.title) # validate file name
         self.author = youtube_obj.author
 
         int_dur = youtube_obj.length
@@ -50,7 +53,7 @@ class VideoObject:
         Сохраняет превью видео
         в виде файла
         """
-        thumbnail_file = SAVE_DIR + self.title + '_thumbnail' + IMAGE_FORMAT
+        thumbnail_file = THUMB_DIR + self.__title_file + '_thumbnail' + IMAGE_FORMAT
 
         with open(thumbnail_file, 'wb') as f:
             f.write(self.thumbnail_img)
@@ -66,12 +69,12 @@ class VideoObject:
                 
                 if cur_stream.is_progressive:
                     cur_stream.download(output_path=SAVE_DIR, 
-                                        filename=self.title + VIDEO_FORMAT)
+                                        filename=self.__title_file + VIDEO_FORMAT)
                 else:
                     print('need audio')
             else:
                 cur_stream = self.cur_video.audio_stream
                 cur_stream.download(output_path=SAVE_DIR, 
-                                    filename=self.title + AUDIO_FORMAT)
+                                    filename=self.__title_file + AUDIO_FORMAT)
         except Exception as e:
              print(f"Ошибка скачивания видео: {str(e)}")
