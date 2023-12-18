@@ -3,9 +3,12 @@
 
 import requests
 import re
+import datetime
+import traceback
 
-from pytube import YouTube
 from collections import OrderedDict
+from pytube import YouTube
+from moviepy.editor import * 
 
 from environment import *
 
@@ -63,18 +66,42 @@ class VideoObject:
         Загружает выбранный поток
         видео или аудио в виде файла
         """
+        video_stream = self.res_stream_dict.get(resolution)
+
         try:
             if not is_only_audio:
-                cur_stream = self.res_stream_dict.get(resolution)
-                
-                if cur_stream.is_progressive:
-                    cur_stream.download(output_path=SAVE_DIR, 
+                if video_stream.is_progressive:
+                    
+                    video_stream.download(output_path=VIDEO_DIR, 
                                         filename=self.__title_file + VIDEO_FORMAT)
                 else:
-                    print('need audio')
+                    """
+                    если поток не содержит аудио,
+                    докачиваем отдельно и 
+                    объединяем с видео 
+                    """
+                    audio_stream = self.audio_stream
+                    
+                    video_path = VIDEO_DIR + '\\' + self.__title_file + '_videopart' + VIDEO_FORMAT
+                    audio_path = AUDIO_DIR + '\\' + self.__title_file + '_audiopart' + AUDIO_FORMAT
+
+                    video_stream.download(output_path=VIDEO_DIR, 
+                                        filename=self.__title_file + '_videopart' + VIDEO_FORMAT)
+                    audio_stream.download(output_path=AUDIO_DIR, 
+                                    filename=self.__title_file + '_audiopart' + AUDIO_FORMAT)
+                    
+                    video_file = VideoFileClip(video_path)
+                    audio_file = AudioFileClip(audio_path)
+                    
+                    final_clip = video_file.set_audio(audio_file)
+                    final_clip.write_videofile(VIDEO_DIR + '\\' + self.__title_file + VIDEO_FORMAT)
+
+                    os.remove(video_path)
+                    os.remove(audio_path)
             else:
-                cur_stream = self.cur_video.audio_stream
-                cur_stream.download(output_path=SAVE_DIR, 
+                audio_stream = self.audio_stream
+                audio_stream.download(output_path=AUDIO_DIR, 
                                     filename=self.__title_file + AUDIO_FORMAT)
         except Exception as e:
              print(f"Ошибка скачивания видео: {str(e)}")
+             traceback.print_exc()
