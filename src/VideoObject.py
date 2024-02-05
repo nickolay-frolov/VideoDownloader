@@ -6,41 +6,33 @@ import re
 import traceback
 
 from collections import OrderedDict
-from pytube import YouTube
+from pytube import YouTube, StreamQuery, Stream
 from moviepy.editor import * 
 
 from environment import *
 
 class VideoObject:
-    url_str: str
-    is_available: bool
+    youtube_obj: YouTube
     title: str
     __title_file: str
     author: str
     duration: str
-    streams: []
+    video_streams: StreamQuery
     thumbnail_img: bytes
     res_stream_dict: dict
 
     def __init__(self, url_str: str):
-        youtube_obj = YouTube(url_str)
+        self.youtube_obj = YouTube(url_str)
         
-        self.title = youtube_obj.title
-        self.__title_file = re.sub(r'[^a-zA-Z0-9\s\-_]', '', self.title) # validate file name
-        self.author = youtube_obj.author
+        self.title = self.youtube_obj.title
+        self.__title_file = re.sub(r'[^a-zA-Z0-9\s\-_]', '', self.title) # валидация имени файла
+        self.author = self.youtube_obj.author
+        self.duration = self.get_duration()
 
-        int_dur = youtube_obj.length
-        str_dur = f"{int_dur // 3600}:{(int_dur % 3600) // 60:02d}:{int_dur % 60:02d}"
-        self.duration = str_dur
+        self.video_streams = self.youtube_obj.streams.filter(file_extension='mp4').order_by('resolution').desc()
+        self.audio_stream = self.youtube_obj.streams.filter(only_audio=True).order_by('abr').last()
 
-        self.video_streams = youtube_obj.streams.order_by('resolution').desc()
-        self.audio_stream = youtube_obj.streams.filter(only_audio=True).order_by('abr').last()
-
-        thumbnail_url = youtube_obj.thumbnail_url
-        thumbnail_url = thumbnail_url[:thumbnail_url.rfind('/')] + '/maxresdefault.jpg'
-        r = requests.get(thumbnail_url, allow_redirects=True, stream=False)
-
-        self.thumbnail_img = r.content
+        self.thumbnail_img = self.get_thumbnail()
         self.res_stream_dict = self.get_stream_dict()
 
     def get_stream_dict(self) -> dict:
@@ -48,8 +40,32 @@ class VideoObject:
         Возвращает словарь из разрешений видео и 
         соответствующих им потоков для скачивания 
         """
-        return OrderedDict((stream.resolution, stream) for stream in self.video_streams)
+        for stream in self.video_streams:
+           print(stream)
+        return OrderedDict((stream.resolution + self.get_filesize(stream),
+                            stream) for stream in self.video_streams)
     
+    def get_duration(self) -> str:
+        int_dur = self.youtube_obj.length
+        return f"{int_dur // 3600}:{(int_dur % 3600) // 60:02d}:{int_dur % 60:02d}"
+    
+    def get_thumbnail(self) -> bytes:
+        thumbnail_url = self.youtube_obj.thumbnail_url
+        
+        # получение максимального качества из всех доступных
+        thumbnail_url = thumbnail_url[:thumbnail_url.rfind('/')] + '/maxresdefault.jpg'
+        thumbnail = requests.get(thumbnail_url, allow_redirects=True, stream=False)
+        return thumbnail.content
+    
+    def get_filesize(self, stream: Stream) -> str:
+        size_mb = stream.filesize / (1024 * 1024)
+        if size_mb >= 1024:
+            size_gb = size_mb / 1024
+            remain_mb = size_mb % 1024
+            return f" {int(size_gb)}GB {round(remain_mb, 2)}MB"
+        else:
+            return f" {round(size_mb, 2)}MB"
+
     def save_thumbnail(self):
         """
         Сохраняет превью видео

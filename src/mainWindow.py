@@ -68,6 +68,8 @@ class MainWindow(QMainWindow):
         self.cancel_min_btn.clicked.connect(self.on_close_click)
         self.minimize_btn.clicked.connect(self.on_minimize_click)
 
+        self.audio_chb.stateChanged.connect(self.audio_chb_pressed)
+
         self.url_le.setFocus()
 
         self.check_save_dir()
@@ -117,6 +119,9 @@ class MainWindow(QMainWindow):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.draggable:
             self.offset = None
+
+    def audio_chb_pressed(self, state):
+        self.res_cb.setEnabled(state != 2)
 
     # check exist save directories
     def check_save_dir(self):

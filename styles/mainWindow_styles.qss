@@ -25,8 +25,16 @@ QPushButton:hover {
     border-color: whitesmoke;
 }
 
+#url_le{
+    padding: 5px;
+}
+
 #res_cb{
     border-radius: 0px;
+}
+
+#res_cb:disabled{
+    background-color: #C0C0C0;
 }
 
 #audio_chb {
@@ -34,6 +42,7 @@ QPushButton:hover {
     color: whitesmoke;
     font-weight: bold;
     background-color: #7aa2f7;
+    padding: 5px;
 }
 
 #duration_label {
@@ -51,12 +60,14 @@ QPushButton:hover {
     font-size: 22px;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    padding: 5px;
 }
 
 #author_label {
     font-size: 18px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+    padding: 5px;
 }
 
 #thumbnail_label {
