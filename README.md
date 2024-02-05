@@ -4,4 +4,5 @@
 используется библиотека Pytube.
 
 
-  ![изображение](https://github.com/LORD-dev86/VideoDownloader/assets/79583622/19995cdb-6d93-4fdb-8447-20b0bf26b76b)
+  ![изображение](https://github.com/LORD-dev86/VideoDownloader/assets/79583622/5070b1b6-0191-4824-bfa1-2d9ed4abb393)
+
