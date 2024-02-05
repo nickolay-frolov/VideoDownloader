@@ -70,3 +70,16 @@ QPushButton:hover {
 #minimize_btn, #cancel_min_btn:hover {
     border-style: none;
 }
+
+#header_frame{
+    background: #7aa2f7;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#name_label{
+    font-size: 20px;
+    font-weight: bolder;
+}

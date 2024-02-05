@@ -3,7 +3,6 @@
 
 import requests
 import re
-import datetime
 import traceback
 
 from collections import OrderedDict

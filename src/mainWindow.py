@@ -13,7 +13,7 @@ from PySide6.QtCore import Qt
 
 from videoObject import VideoObject
 from environment import *
-
+from mainWindow_resources import *
 
 class MainWindow(QMainWindow):
     download_btn: QPushButton
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
 
             loader = QUiLoader()
             window = loader.load(ui_file)
-
+            
             self.setStyleSheet(style_file.readAll().data().decode("utf-8"))
 
             if not window:
