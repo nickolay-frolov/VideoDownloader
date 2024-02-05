@@ -1,2 +1,8 @@
 # VideoDownloader
-The “Video Downloader” program is designed to download videos from YouTube. It provides the ability to select the quality of the downloaded video and the format of the saved file. There are options to download only an audio track or a video preview. The program is written in the PySide6 framework using the Putube library.
+Программа «Video Downloader» предназначена для скачивания видео с YouTube. Предоставляется возможность выбора качества загружаемого видео. 
+Возможно скачать только аудиодорожку или превью видео. Программа написана на фреймворке PySide6, для взаимодействия с YouTube API 
+используется библиотека Pytube.
+
+
+  ![изображение](https://github.com/LORD-dev86/VideoDownloader/assets/79583622/5070b1b6-0191-4824-bfa1-2d9ed4abb393)
+
