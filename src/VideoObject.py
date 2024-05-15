@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import unicodedata
 import requests
 import re
 import traceback
@@ -25,7 +26,10 @@ class VideoObject:
         self.youtube_obj = YouTube(url_str)
         
         self.title = self.youtube_obj.title
-        self.__title_file = re.sub(r'[^a-zA-Z0-9\s\-_]', '', self.title) # валидация имени файла
+        
+        # валидация имени файла
+        self.__title_file = re.sub(r'[^a-zA-ZА-Яа-я0-9~@#$%^-_()\[\]{}\'`\s\-_\.]', '', self.title) 
+        
         self.author = self.youtube_obj.author
         self.duration = self.get_duration()
 
@@ -40,8 +44,8 @@ class VideoObject:
         Возвращает словарь из разрешений видео и 
         соответствующих им потоков для скачивания 
         """
-        for stream in self.video_streams:
-           print(stream)
+        # for stream in self.video_streams:
+        #   print(stream)
         return OrderedDict((stream.resolution + self.get_filesize(stream),
                             stream) for stream in self.video_streams)
     
